@@ -6,7 +6,7 @@ test <- read.csv("data/test.csv", header = T)
 test.survived <- data.frame(Survived = rep("None", nrow(test)), test[,])
 
 #Combine data sets
-data.combined<- rbind(train, test)
+data.combined <- rbind(train, test.survived)
 
 # A bit about R data types (e.g. factors)
 str(data.combined)
@@ -22,8 +22,9 @@ library(ggplot2)
 train$Pclass <- as.factor(train$Pclass)
 
 ggplot(train, aes(x = Pclass, fill = factor(Survived)))+ 
-  geom_histogram(width = 0.5) +
-  xlab("PClass")+
+  #geom_bar() +
+        stat_count(width = 0.5) +
+        xlab("PClass")+
   ylab("Total Count") +
   labs(fill = "Survived")
 
@@ -77,7 +78,7 @@ for(i in 1:nrow(data.combined)){
 data.combined$title <- as.factor(titles)
 
 ggplot(data.combined[1:891,], aes(x = title, fill = Survived))+
-  geom_bar(binwidth = 0.5)+
+        stat_count(width = 0.5) +
   facet_wrap(~Pclass)+
   ggtitle("PClass")+
   xlab("Title")+
@@ -90,7 +91,7 @@ table(data.combined$Sex)
 
 # Visualize the 3-way relationship of sex, pclass, and survival, compare to analysis of title
 ggplot(data.combined[1:891,], aes(x = Sex, fill = Survived)) +
-  geom_bar(binwidth = 0.5) +
+  geom_bar() +
   facet_wrap(~Pclass) + 
   ggtitle("Pclass") +
   xlab("Sex") +
@@ -105,7 +106,8 @@ summary(data.combined[1:891,"Age"])
 # Just to be thorough, take a look at survival rates broken out by sex, pclass, and age
 ggplot(data.combined[1:891,], aes(x = Age, fill = Survived)) +
   facet_wrap(~Sex + Pclass) +
-  geom_histogram(binwidth = 10) +
+  #geom_histogram(binwidth = 10) +
+        stat_count(width = 10) +
   xlab("Age") +
   ylab("Total Count")
 
@@ -119,9 +121,10 @@ summary(boys$age)
 misses <- data.combined[which(data.combined$title == "Miss."),]
 summary(misses$age)
 
-ggplot(misses[misses$survived != "None",], aes(x = age, fill = survived)) +
-  facet_wrap(~pclass) +
-  geom_histogram(binwidth = 5) +
+ggplot(misses[misses$Survived != "None" & !is.na(misses$Age) ,], aes(x = Age, fill = Survived)) +
+  facet_wrap(~Pclass) +
+        stat_count(width = 0.5) +
+        #geom_bar()+
   ggtitle("Age for 'Miss.' by Pclass") + 
   xlab("Age") +
   ylab("Total Count")
